@@ -33,7 +33,8 @@
     "eslint-plugin-react-hooks": "^4.0.0",
     "eslint-plugin-react-refresh": "^0.4.4",
     "typescript": "^5.0.0",
-    "webpack": "^5.89.0"
+    "webpack": "^5.89.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,0 +1,17 @@
+@import '../global/variables';
+
+button {
+    background-color: var(--color-white-alpha-20);
+    color: var(--color-white-alpha-80);
+    border: 2px solid var(--color-background);
+    border-radius: var(--border-radius);
+
+    &:hover {
+        background-color: var(--color-white-alpha-30);
+    }
+
+    &:disabled {
+        background-color: var(--color-white-alpha-10);
+        color: var(--color-white-alpha-20);
+    }
+}
