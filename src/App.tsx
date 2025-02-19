@@ -1,9 +1,13 @@
 import React from "react";
-import Editor from "./components/Editor/Editor";
+import EditorWrapper from "./components/Editor/EditorWrapper";
 import "./styles/main.scss";
 
-export const App: React.FC = () => {
-  return <Editor />;
+const App: React.FC = () => {
+  return (
+    <div className="app">
+      <EditorWrapper />
+    </div>
+  );
 };
 
 export default App;

@@ -1,15 +1,18 @@
 import React from "react";
-import { useCurrentEditor } from "@tiptap/react";
+import { Editor } from '@tiptap/react';
 
-export const MenuBar: React.FC = () => {
-  const { editor } = useCurrentEditor();
+interface MenuBarProps {
+  isEditable: boolean;
+  editor: Editor | null;
+}
 
-  if (!editor) {
+export const MenuBar: React.FC<MenuBarProps> = ({ isEditable, editor }) => {
+  if (!editor || !isEditable) {
     return null;
   }
 
   return (
-    <>
+    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
@@ -116,7 +119,7 @@ export const MenuBar: React.FC = () => {
       >
         purple
       </button>
-    </>
+    </div>
   );
 };
 

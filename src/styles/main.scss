@@ -1,3 +1,49 @@
 @import 'global/base';
 @import 'components/buttons';
 @import 'components/editor';
+
+.editor-container {
+    position: relative;
+    padding-top: 50px;
+}
+
+.edit-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 8px 16px;
+    background-color: #4a4a4a;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1000;
+
+    &:hover {
+        opacity: 0.9;
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+}
+
+.editor {
+    margin-top: 20px;
+}
+
+.ProseMirror {
+    &[contenteditable="false"] {
+        cursor: default;
+        pointer-events: none;
+    }
+}
+
+.editor-menu-bar {
+    margin: 1rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+}
