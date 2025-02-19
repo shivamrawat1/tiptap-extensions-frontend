@@ -1,6 +1,7 @@
 import React from "react";
 import { Editor } from '@tiptap/react';
 
+
 interface MenuBarProps {
   isEditable: boolean;
   editor: Editor | null;
@@ -9,6 +10,18 @@ interface MenuBarProps {
 export const MenuBar: React.FC<MenuBarProps> = ({ isEditable, editor }) => {
   if (!editor || !isEditable) {
     return null;
+  }
+
+  const addMCQ = () => {
+    editor.chain().focus().insertContent({
+      type: 'mcq',
+      attrs: {
+        question: 'Enter your question here',
+        choices: ['Option 1', 'Option 2'],
+        correctChoice: 0,
+        selectedChoice: null
+      }
+    }).run()
   }
 
   return (
@@ -118,6 +131,13 @@ export const MenuBar: React.FC<MenuBarProps> = ({ isEditable, editor }) => {
         className={editor.isActive("textStyle", { color: "#958DF1" }) ? "is-active" : ""}
       >
         purple
+      </button>
+      <button
+        onClick={addMCQ}
+        className={`${editor.isActive('mcq') ? 'is-active' : ''} menu-button`}
+        title="Insert Multiple Choice Question"
+      >
+        Add MCQ
       </button>
     </div>
   );

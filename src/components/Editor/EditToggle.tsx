@@ -14,6 +14,7 @@ export const EditToggle: React.FC<EditToggleProps> = ({ isEditable, onToggle }) 
                 position: 'absolute',
                 top: '10px',
                 right: '10px',
+                zIndex: 10,
                 padding: '8px 16px',
                 backgroundColor: isEditable ? '#e0e0e0' : '#4a4a4a',
                 color: isEditable ? '#000' : '#fff',
