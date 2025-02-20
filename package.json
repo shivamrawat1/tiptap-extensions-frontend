@@ -1,51 +1,39 @@
 {
-  "name": "react",
-  "version": "1.0.0",
-  "description": "React example starter project",
-  "keywords": [
-    "react",
-    "starter"
-  ],
-  "main": "src/index.js",
   "dependencies": {
-    "@tiptap/core": "2.1.13",
-    "@tiptap/extension-color": "latest",
-    "@tiptap/extension-list-item": "2.1.13",
-    "@tiptap/extension-text-style": "2.1.13",
-    "@tiptap/pm": "2.1.13",
-    "@tiptap/react": "2.1.13",
-    "@tiptap/starter-kit": "2.1.13",
-    "loader-utils": "3.2.1",
-    "react": "latest",
-    "react-dom": "latest",
-    "react-scripts": "latest",
-    "sass": "1.69.5"
+    "@tiptap/core": "^2.11.5",
+    "@tiptap/extension-bubble-menu": "^2.11.5",
+    "@tiptap/extension-color": "^2.11.5",
+    "@tiptap/extension-list-item": "^2.11.5",
+    "@tiptap/extension-text-style": "^2.11.5",
+    "@tiptap/pm": "^2.11.5",
+    "@tiptap/react": "^2.11.5",
+    "@tiptap/starter-kit": "^2.11.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sass": "^1.85.0"
   },
   "devDependencies": {
-    "@babel/runtime": "7.13.8",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.2.0",
-    "eslint-plugin-react": "^7.20.6",
-    "eslint-plugin-react-hooks": "^4.0.0",
-    "eslint-plugin-react-refresh": "^0.4.4",
-    "typescript": "^5.0.0",
-    "webpack": "^5.89.0",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "react-scripts": "^5.0.1",
+    "typescript": "^4.9.5"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

@@ -1,0 +1,60 @@
+.command-menu {
+    position: absolute;
+    background: var(--color-background);
+    border: 1px solid var(--color-white-alpha-20);
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
+    min-width: 200px;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.command-menu-icon {
+    position: fixed;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-background);
+    border: 1px solid var(--color-white-alpha-20);
+    border-radius: 4px;
+    z-index: 50;
+    transition: all 0.2s ease;
+    pointer-events: all;
+
+    &:hover {
+        background: var(--color-white-alpha-10);
+        transform: scale(1.1);
+    }
+}
+
+.command-option {
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: block;
+
+    &:hover {
+        background: var(--color-white-alpha-10);
+    }
+}
+
+.command-option-title {
+    font-weight: bold;
+    color: var(--color-text);
+}
+
+.command-option-description {
+    font-size: 0.8rem;
+    color: var(--color-white-alpha-80);
+}
+
+.editor-wrapper {
+    position: relative;
+    padding-left: 2rem;
+}
