@@ -88,15 +88,18 @@ export const CommandsExtension = Extension.create({
                             },
                         },
                         {
-                            title: 'Code Block',
-                            description: 'Add a code block',
-                            attrs: { 'data-test-id': 'insert-code' },
+                            title: 'Python Code Block',
+                            description: 'Add an executable Python code block',
+                            attrs: { 'data-test-id': 'insert-python-code' },
                             command: ({ editor, range }) => {
                                 editor
                                     .chain()
                                     .focus()
                                     .deleteRange(range)
-                                    .setCodeBlock()
+                                    .setPythonCodeBlock({
+                                        template: '# Write your Python code here\n\n# Example:\n# print("Hello, World!")\n',
+                                        question: 'Write your question here'
+                                    })
                                     .run();
                             },
                         },

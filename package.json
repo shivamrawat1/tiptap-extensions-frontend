@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
     "@tiptap/core": "^2.11.5",
     "@tiptap/extension-bubble-menu": "^2.11.5",
     "@tiptap/extension-color": "^2.11.5",

@@ -1,0 +1,114 @@
+.code-block-wrapper {
+    margin: 1rem 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+
+    .question-section {
+        padding: 1rem;
+        background-color: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+
+        .question-input {
+            width: 100%;
+            min-height: 60px;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            resize: vertical;
+            color: #1a1a1a;
+            background-color: #ffffff;
+
+            &::placeholder {
+                color: #1a1a1a;
+                opacity: 0.7;
+            }
+
+            &:focus {
+                outline: none;
+                border-color: #4CAF50;
+            }
+        }
+
+        .question-display {
+            color: #1a1a1a;
+            font-size: 1rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+    }
+
+    .code-block-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        background-color: #1e1e1e;
+        color: #fff;
+
+        .language-label {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .run-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+
+            &:hover {
+                background-color: #45a049;
+            }
+
+            &:disabled {
+                background-color: #cccccc;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    .code-editor {
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .output-section {
+        background-color: #ffffff;
+
+        .output-header {
+            padding: 0.5rem 1rem;
+            font-weight: bold;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1a1a1a;
+        }
+
+        .output-content {
+            padding: 1rem;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #ffffff;
+
+            pre {
+                margin: 0;
+                white-space: pre-wrap;
+                font-family: monospace;
+                color: #1a1a1a;
+            }
+
+            .error {
+                color: #dc3545;
+            }
+
+            .no-output {
+                color: #1a1a1a;
+                font-style: italic;
+            }
+        }
+    }
+}

@@ -4,8 +4,7 @@ import TextStyle from "@tiptap/extension-text-style";
 import StarterKit from "@tiptap/starter-kit";
 import { CommandsExtension } from './extensions/CommandsExtension'
 import { MCQExtension } from './extensions/MCQExtension';
-
-
+import { CodeBlockExtension } from './extensions/CodeBlockExtension';
 
 export const extensions = [
   Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -19,9 +18,15 @@ export const extensions = [
       keepMarks: true,
       keepAttributes: false,
     },
+    codeBlock: false,
   }),
   CommandsExtension,
   MCQExtension,
+  CodeBlockExtension.configure({
+    HTMLAttributes: {
+      class: 'python-code-block',
+    },
+  }),
 ];
 
 export const defaultContent = `
