@@ -53,7 +53,7 @@ export const MCQExtension = Node.create<MCQOptions>({
                 }),
             },
             correctAnswer: {
-                default: null,
+                default: 0,
             },
             selectedAnswer: {
                 default: null,
@@ -86,7 +86,7 @@ export const MCQExtension = Node.create<MCQOptions>({
                             attrs: {
                                 question: 'Enter your question here',
                                 choices: ['Option 1', 'Option 2'],
-                                correctAnswer: null,
+                                correctAnswer: 0,
                                 selectedAnswer: null,
                                 id: `mcq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                             },

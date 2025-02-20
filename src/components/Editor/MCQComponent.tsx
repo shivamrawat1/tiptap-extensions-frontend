@@ -153,17 +153,17 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
                         {attrs.choices.map((choice: string, index: number) => (
                             <div key={index} className="mcq-choice-edit">
                                 <input
+                                    type="radio"
+                                    name={`correctAnswer-${attrs.id}`}
+                                    checked={attrs.correctAnswer === index}
+                                    onChange={() => handleCorrectAnswerChange(index)}
+                                />
+                                <input
                                     type="text"
                                     value={choice}
                                     onChange={(e) => handleChoiceChange(index, e.target.value)}
                                     onFocus={() => handleOptionFocus(index, choice)}
                                     placeholder={`Option ${index + 1}`}
-                                />
-                                <input
-                                    type="radio"
-                                    name={`correctAnswer-${attrs.id}`}
-                                    checked={attrs.correctAnswer === index}
-                                    onChange={() => handleCorrectAnswerChange(index)}
                                 />
                                 <label>Correct</label>
                                 <button
@@ -191,13 +191,10 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
                             <div
                                 key={index}
                                 className={`mcq-choice ${attrs.selectedAnswer === index ? 'selected' : ''}`}
+                                onClick={() => handleStudentSelection(index)}
+                                role="button"
+                                tabIndex={0}
                             >
-                                <input
-                                    type="radio"
-                                    name={`mcq-answer-${attrs.id}`}
-                                    checked={attrs.selectedAnswer === index}
-                                    onChange={() => handleStudentSelection(index)}
-                                />
                                 <label>{choice}</label>
                             </div>
                         ))}
