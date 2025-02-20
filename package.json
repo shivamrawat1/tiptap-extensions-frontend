@@ -8,6 +8,7 @@
     "@tiptap/pm": "^2.11.5",
     "@tiptap/react": "^2.11.5",
     "@tiptap/starter-kit": "^2.11.5",
+    "@tiptap/suggestion": "^2.11.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sass": "^1.85.0"
