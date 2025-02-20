@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { EditorBubbleMenu } from "./BubbleMenu";
+import { EditableToggle } from "./EditableToggle";
 import { extensions, defaultContent } from "./config";
 import '../../styles/components/bubblebar.scss';
 
@@ -27,17 +28,15 @@ export const Editor: React.FC = () => {
     };
 
     return (
-        <div className="editor-wrapper">
-            {/* Add toggle button */}
-            <button
-                onClick={toggleEditable}
-                className="mb-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-                {isEditable ? 'Disable Editing' : 'Enable Editing'}
-            </button>
-
-            {editor && <EditorBubbleMenu editor={editor} />}
-            <EditorContent editor={editor} />
+        <div>
+            <EditableToggle
+                isEditable={isEditable}
+                onToggle={toggleEditable}
+            />
+            <div className="editor-wrapper">
+                {editor && <EditorBubbleMenu editor={editor} />}
+                <EditorContent editor={editor} />
+            </div>
         </div>
     );
 };
