@@ -160,4 +160,115 @@
             }
         }
     }
+
+    .test-cases-section {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+
+        h4 {
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        .test-case {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: flex-start;
+
+            textarea {
+                flex: 1;
+                min-height: 60px;
+                padding: 0.5rem;
+                border: 1px solid #e2e8f0;
+                border-radius: 0.25rem;
+                resize: vertical;
+            }
+
+            button {
+                padding: 0.5rem;
+                background-color: #dc3545;
+                color: white;
+                border: none;
+                border-radius: 0.25rem;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #c82333;
+                }
+            }
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #45a049;
+            }
+        }
+    }
+
+    .test-results-section {
+        padding: 1rem;
+        background-color: #1e1e1e;
+        border-top: 1px solid #333;
+
+        h4 {
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+
+        .test-cases-results {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            .test-case-result {
+                padding: 0.5rem;
+                border-radius: 0.25rem;
+                color: #ffffff;
+
+                &.passed {
+                    background-color: rgba(76, 175, 80, 0.2);
+                }
+
+                &.failed {
+                    background-color: rgba(220, 53, 69, 0.2);
+                }
+
+                .result-details {
+                    margin-top: 0.5rem;
+                    font-size: 0.9rem;
+                    opacity: 0.8;
+                }
+            }
+        }
+    }
+
+    .submit-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: #0056b3;
+        }
+
+        &:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    }
 }

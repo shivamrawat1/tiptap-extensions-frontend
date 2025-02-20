@@ -4,11 +4,24 @@ import MonacoEditor from '@monaco-editor/react';
 import { executePythonCode } from '../../services/pythonExecutionService';
 import '../../styles/components/_codeblock.scss';
 
+interface TestCase {
+    input: string;
+    expectedOutput: string;
+}
+
+interface TestResult {
+    passed: boolean;
+    actual: string;
+    expected: string;
+}
+
 interface CodeBlockAttributes {
     language: string;
     code: string;
     template?: string;
     question: string;
+    testCases: TestCase[];
+    testResults: TestResult[] | null;
 }
 
 export const CodeBlockComponent: React.FC<NodeViewProps> = ({
@@ -21,6 +34,7 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
     const [error, setError] = useState<string | null>(null);
     const [, forceUpdate] = useReducer(x => x + 1, 0);
     const [savedCode, setSavedCode] = useState<string | null>(null);
+    const [testResults, setTestResults] = useState<TestResult[] | null>(null);
 
     // Track editor's editable state
     const [isEditable, setIsEditable] = useState(editor?.isEditable ?? false);
@@ -68,9 +82,31 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
         }
     };
 
+    const handleAddTestCase = () => {
+        const currentTestCases = [...(attrs.testCases || [])];
+        currentTestCases.push({ input: '', expectedOutput: '' });
+        updateAttributes({ testCases: currentTestCases });
+    };
+
+    const handleTestCaseChange = (index: number, field: 'expectedOutput', value: string) => {
+        const currentTestCases = [...(attrs.testCases || [])];
+        currentTestCases[index] = {
+            ...currentTestCases[index],
+            [field]: value
+        };
+        updateAttributes({ testCases: currentTestCases });
+    };
+
+    const handleRemoveTestCase = (index: number) => {
+        const currentTestCases = [...(attrs.testCases || [])];
+        currentTestCases.splice(index, 1);
+        updateAttributes({ testCases: currentTestCases });
+    };
+
     const runCode = async () => {
         setIsRunning(true);
         setError(null);
+        setTestResults(null); // Clear previous test results when running code
 
         try {
             const response = await executePythonCode(attrs.code);
@@ -89,6 +125,55 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
         }
     };
 
+    const handleSubmit = async () => {
+        setIsRunning(true);
+        setError(null);
+        const results: TestResult[] = [];
+
+        try {
+            // Execute the code once
+            const response = await executePythonCode(attrs.code);
+
+            if (!response.success) {
+                setError(response.error || 'Execution failed');
+                return;
+            }
+
+            // Split the output into lines and trim each line
+            const outputLines = (response.output || '')
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0); // Remove empty lines
+
+            // Compare each line with corresponding test case
+            attrs.testCases.forEach((testCase, index) => {
+                const expected = testCase.expectedOutput.trim();
+                const actual = outputLines[index] || ''; // Get corresponding line or empty string if no output
+
+                results.push({
+                    passed: actual === expected,
+                    actual,
+                    expected
+                });
+            });
+
+            // Check if we have enough output lines for all test cases
+            if (outputLines.length < attrs.testCases.length) {
+                setError(`Not enough output lines. Expected ${attrs.testCases.length} lines but got ${outputLines.length}`);
+            } else if (outputLines.length > attrs.testCases.length) {
+                setError(`Too many output lines. Expected ${attrs.testCases.length} lines but got ${outputLines.length}`);
+            }
+
+            setTestResults(results);
+            const passedCount = results.filter(r => r.passed).length;
+            setOutput(`Passed ${passedCount}/${results.length} test cases`);
+        } catch (err) {
+            setError('Failed to execute test cases. Please try again.');
+        } finally {
+            setIsRunning(false);
+        }
+    };
+
     const handleReset = () => {
         // Reset to saved code if available, otherwise fall back to template
         updateAttributes({
@@ -100,12 +185,28 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
         <NodeViewWrapper className="code-block-wrapper">
             <div className="question-section">
                 {isEditable ? (
-                    <textarea
-                        className="question-input"
-                        value={attrs.question || ''}
-                        onChange={handleQuestionChange}
-                        placeholder="Enter your question here..."
-                    />
+                    <>
+                        <textarea
+                            className="question-input"
+                            value={attrs.question || ''}
+                            onChange={handleQuestionChange}
+                            placeholder="Enter your question here..."
+                        />
+                        <div className="test-cases-section">
+                            <h4>Test Cases</h4>
+                            {(attrs.testCases || []).map((testCase, index) => (
+                                <div key={index} className="test-case">
+                                    <textarea
+                                        placeholder="Expected Output"
+                                        value={testCase.expectedOutput}
+                                        onChange={(e) => handleTestCaseChange(index, 'expectedOutput', e.target.value)}
+                                    />
+                                    <button onClick={() => handleRemoveTestCase(index)}>Remove</button>
+                                </div>
+                            ))}
+                            <button onClick={handleAddTestCase}>Add Test Case</button>
+                        </div>
+                    </>
                 ) : (
                     <div className="question-display">
                         {attrs.question || 'No question provided'}
@@ -131,6 +232,13 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
                                 disabled={isRunning}
                             >
                                 {isRunning ? 'Running...' : 'Run Code'}
+                            </button>
+                            <button
+                                className="submit-button"
+                                onClick={handleSubmit}
+                                disabled={isRunning || !(attrs.testCases || []).length}
+                            >
+                                Submit
                             </button>
                         </div>
                     </div>
@@ -165,6 +273,25 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
                     </div>
                 </div>
             </div>
+
+            {testResults && (
+                <div className="test-results-section">
+                    <h4>Test Results</h4>
+                    <div className="test-cases-results">
+                        {testResults.map((result, index) => (
+                            <div key={index} className={`test-case-result ${result.passed ? 'passed' : 'failed'}`}>
+                                <div>Test Case {index + 1}: {result.passed ? 'Passed' : 'Failed'}</div>
+                                {!result.passed && (
+                                    <div className="result-details">
+                                        <div>Expected: {result.expected}</div>
+                                        <div>Actual: {result.actual}</div>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </NodeViewWrapper>
     );
 }; 

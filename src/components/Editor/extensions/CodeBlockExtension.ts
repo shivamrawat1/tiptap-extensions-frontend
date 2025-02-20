@@ -2,6 +2,11 @@ import { Node } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { CodeBlockComponent } from '../CodeBlockComponent';
 
+interface TestCase {
+    input: string;
+    expectedOutput: string;
+}
+
 export interface CodeBlockOptions {
     HTMLAttributes: Record<string, any>;
 }
@@ -12,6 +17,7 @@ declare module '@tiptap/core' {
             setPythonCodeBlock: (options?: {
                 template?: string;
                 question?: string;
+                testCases?: TestCase[];
             }) => ReturnType;
         };
     }
@@ -43,6 +49,14 @@ export const CodeBlockExtension = Node.create<CodeBlockOptions>({
                 parseHTML: () => null,
                 renderHTML: () => null,
             },
+            testCases: {
+                default: [],
+            },
+            testResults: {
+                default: null,
+                parseHTML: () => null,
+                renderHTML: () => null,
+            },
         };
     },
 
@@ -70,6 +84,7 @@ export const CodeBlockExtension = Node.create<CodeBlockOptions>({
                                 code: options.template || '# Write your Python code here\n',
                                 template: options.template || null,
                                 question: options.question || '',
+                                testCases: options.testCases || [],
                             },
                         });
                     },

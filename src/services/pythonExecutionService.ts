@@ -2,6 +2,7 @@ import axios from 'axios';
 
 interface PythonExecutionRequest {
     code: string;
+    input?: string;
 }
 
 interface PythonExecutionResponse {
@@ -12,11 +13,11 @@ interface PythonExecutionResponse {
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:4000';
 
-export const executePythonCode = async (code: string): Promise<PythonExecutionResponse> => {
+export const executePythonCode = async (code: string, input?: string): Promise<PythonExecutionResponse> => {
     try {
         const response = await axios.post<PythonExecutionResponse>(
             `${API_BASE_URL}/api/python/execute`,
-            { code } as PythonExecutionRequest,
+            { code, input } as PythonExecutionRequest,
             {
                 headers: {
                     'Content-Type': 'application/json',
