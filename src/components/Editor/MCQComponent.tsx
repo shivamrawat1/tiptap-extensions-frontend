@@ -125,16 +125,19 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
     };
 
     const handleSubmit = async () => {
-        if (!attrs.selectedAnswer) {
+        if (attrs.selectedAnswer === null) {
             console.error('Please select an answer');
             return;
         }
 
         try {
+            const selectedAnswerText = attrs.choices[attrs.selectedAnswer];
+            const correctAnswerText = attrs.correctAnswer !== null ? attrs.choices[attrs.correctAnswer] : '';
+
             const response = await submitMCQAnswerWithDefaultUser(
                 attrs.id,
-                attrs.selectedAnswer.toString(),
-                attrs.correctAnswer?.toString() || ''
+                selectedAnswerText,
+                correctAnswerText
             );
 
             if (response.success) {

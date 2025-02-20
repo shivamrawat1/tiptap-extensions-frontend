@@ -43,7 +43,7 @@ export const submitMCQAnswerWithDefaultUser = async (
     selectedAnswer: string,
     correctAnswer: string,
 ): Promise<MCQSubmissionResponse> => {
-    const defaultUsername = 'abc'; // You can modify this as needed
+    const defaultUsername = 'abc';
 
     return submitMCQAnswer({
         mcqId,
