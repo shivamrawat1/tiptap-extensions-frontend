@@ -1,5 +1,6 @@
 import React from 'react';
 import { NodeViewWrapper, NodeViewProps } from '@tiptap/react';
+import { Editor } from '@tiptap/core';
 import '../../styles/components/_mcq.scss';
 import { MCQAttributes } from './extensions/MCQExtension';
 
@@ -8,39 +9,70 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
     updateAttributes,
     editor,
     deleteNode,
+    getPos,
 }) => {
-    const isEditable = editor.isEditable;
+    const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+
+    // Get editable state directly from editor
+    const isEditable = editor?.isEditable ?? false;
+
+    // Force update when editor state changes
+    React.useEffect(() => {
+        if (!editor) return;
+
+        const handleStateChange = () => {
+            forceUpdate();
+        };
+
+        editor.on('transaction', handleStateChange);
+        editor.on('update', handleStateChange);
+
+        return () => {
+            editor.off('transaction', handleStateChange);
+            editor.off('update', handleStateChange);
+        };
+    }, [editor]);
+
+    const safeUpdateAttributes = React.useCallback((attrs: Partial<MCQAttributes>) => {
+        if (isEditable && updateAttributes) {
+            updateAttributes(attrs);
+        }
+    }, [isEditable, updateAttributes]);
+
     const attrs = node.attrs as MCQAttributes;
 
     const handleQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        updateAttributes({ question: e.target.value });
+        safeUpdateAttributes({ question: e.target.value });
     };
 
     const handleChoiceChange = (index: number, value: string) => {
         const newChoices = [...attrs.choices];
         newChoices[index] = value;
-        updateAttributes({ choices: newChoices });
+        safeUpdateAttributes({ choices: newChoices });
     };
 
     const handleCorrectAnswerChange = (index: number) => {
-        updateAttributes({ correctAnswer: index });
+        safeUpdateAttributes({ correctAnswer: index });
     };
 
     const handleStudentSelection = (index: number) => {
-        updateAttributes({ selectedAnswer: index });
+        if (!isEditable) {
+            safeUpdateAttributes({ selectedAnswer: index });
+        }
     };
 
     const addOption = () => {
+        if (!isEditable) return;
         const newChoices = [...attrs.choices, `Option ${attrs.choices.length + 1}`];
-        updateAttributes({ choices: newChoices });
+        safeUpdateAttributes({ choices: newChoices });
     };
 
     const removeOption = (index: number) => {
-        if (attrs.choices.length <= 2) return; // Minimum 2 options
-        const newChoices = attrs.choices.filter((_, i) => i !== index);
+        if (!isEditable || attrs.choices.length <= 2) return;
 
-        // Handle the correctAnswer update with null check
+        const newChoices = attrs.choices.filter((_, i) => i !== index);
         let newCorrectAnswer = attrs.correctAnswer;
+
         if (attrs.correctAnswer !== null) {
             if (attrs.correctAnswer === index) {
                 newCorrectAnswer = null;
@@ -49,14 +81,16 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
             }
         }
 
-        updateAttributes({
+        safeUpdateAttributes({
             choices: newChoices,
             correctAnswer: newCorrectAnswer
         });
     };
 
     const handleDelete = () => {
-        deleteNode();
+        if (isEditable && deleteNode) {
+            deleteNode();
+        }
     };
 
     return (
@@ -119,10 +153,10 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
                         {attrs.choices.map((choice: string, index: number) => (
                             <div
                                 key={index}
-                                className={`mcq-choice ${attrs.selectedAnswer === index ? 'selected' : ''
-                                    } ${attrs.selectedAnswer !== null &&
-                                        attrs.correctAnswer === index ? 'correct' : ''
-                                    } ${attrs.selectedAnswer === index &&
+                                className={`mcq-choice ${attrs.selectedAnswer === index ? 'selected' : ''}
+                                    ${attrs.selectedAnswer !== null &&
+                                        attrs.correctAnswer === index ? 'correct' : ''}
+                                    ${attrs.selectedAnswer === index &&
                                         attrs.selectedAnswer !== attrs.correctAnswer ? 'incorrect' : ''
                                     }`}
                             >

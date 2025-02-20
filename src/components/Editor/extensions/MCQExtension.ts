@@ -1,6 +1,9 @@
-import { Node } from '@tiptap/core';
+import { Node, NodeViewProps } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { MCQComponent } from '../MCQComponent';
+import { Node as ProseMirrorNode } from '@tiptap/pm/model';
+import { Decoration } from '@tiptap/pm/view';
+import { EditorState } from '@tiptap/pm/state';
 
 export interface MCQOptions {
     HTMLAttributes: Record<string, any>;
@@ -11,7 +14,7 @@ export interface MCQAttributes {
     choices: string[];
     correctAnswer: number | null;
     selectedAnswer: number | null;
-    id: string; // Add unique identifier for each MCQ
+    id: string;
 }
 
 declare module '@tiptap/core' {
@@ -89,6 +92,10 @@ export const MCQExtension = Node.create<MCQOptions>({
     },
 
     addNodeView() {
-        return ReactNodeViewRenderer(MCQComponent);
+        return ReactNodeViewRenderer(MCQComponent, {
+            update: ({ newNode, oldNode }) => {
+                return !oldNode.sameMarkup(newNode);
+            },
+        });
     },
 }); 
