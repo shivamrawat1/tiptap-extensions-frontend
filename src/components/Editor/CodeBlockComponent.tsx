@@ -20,6 +20,7 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
     const [isRunning, setIsRunning] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [, forceUpdate] = useReducer(x => x + 1, 0);
+    const [savedCode, setSavedCode] = useState<string | null>(null);
 
     // Track editor's editable state
     const [isEditable, setIsEditable] = useState(editor?.isEditable ?? false);
@@ -29,7 +30,14 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
         if (!editor) return;
 
         const handleStateChange = () => {
-            setIsEditable(editor.isEditable);
+            const newIsEditable = editor.isEditable;
+
+            // If switching from edit to view mode, save the current code
+            if (isEditable && !newIsEditable) {
+                setSavedCode(node.attrs.code);
+            }
+
+            setIsEditable(newIsEditable);
             forceUpdate();
         };
 
@@ -44,7 +52,7 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
             editor.off('transaction', handleStateChange);
             editor.off('update', handleStateChange);
         };
-    }, [editor]);
+    }, [editor, isEditable, node.attrs.code]);
 
     const attrs = node.attrs as CodeBlockAttributes;
 
@@ -81,6 +89,13 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
         }
     };
 
+    const handleReset = () => {
+        // Reset to saved code if available, otherwise fall back to template
+        updateAttributes({
+            code: savedCode || attrs.template || '# Write your Python code here\n'
+        });
+    };
+
     return (
         <NodeViewWrapper className="code-block-wrapper">
             <div className="question-section">
@@ -98,43 +113,56 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
                 )}
             </div>
 
-            <div className="code-block-header">
-                <span className="language-label">Python</span>
-                <button
-                    className="run-button"
-                    onClick={runCode}
-                    disabled={isRunning}
-                >
-                    {isRunning ? 'Running...' : 'Run Code'}
-                </button>
-            </div>
+            <div className="code-content-wrapper">
+                <div className="code-section">
+                    <div className="code-block-header">
+                        <span className="language-label">Python</span>
+                        <div className="button-group">
+                            <button
+                                className="reset-button"
+                                onClick={handleReset}
+                                title="Reset Code"
+                            >
+                                Reset
+                            </button>
+                            <button
+                                className="run-button"
+                                onClick={runCode}
+                                disabled={isRunning}
+                            >
+                                {isRunning ? 'Running...' : 'Run Code'}
+                            </button>
+                        </div>
+                    </div>
 
-            <div className="code-editor">
-                <MonacoEditor
-                    height="200px"
-                    language="python"
-                    theme="vs-dark"
-                    value={attrs.code}
-                    onChange={handleEditorChange}
-                    options={{
-                        minimap: { enabled: false },
-                        lineNumbers: 'on',
-                        readOnly: false,
-                        scrollBeyondLastLine: false,
-                    }}
-                />
-            </div>
+                    <div className="code-editor">
+                        <MonacoEditor
+                            height="100%"
+                            language="python"
+                            theme="vs-dark"
+                            value={attrs.code}
+                            onChange={handleEditorChange}
+                            options={{
+                                minimap: { enabled: false },
+                                lineNumbers: 'on',
+                                readOnly: false,
+                                scrollBeyondLastLine: false,
+                            }}
+                        />
+                    </div>
+                </div>
 
-            <div className="output-section">
-                <div className="output-header">Output:</div>
-                <div className="output-content">
-                    {error ? (
-                        <pre className="error">{error}</pre>
-                    ) : output ? (
-                        <pre>{output}</pre>
-                    ) : (
-                        <div className="no-output">Run the code to see output</div>
-                    )}
+                <div className="output-section">
+                    <div className="output-header">Output:</div>
+                    <div className="output-content">
+                        {error ? (
+                            <pre className="error">{error}</pre>
+                        ) : output ? (
+                            <pre>{output}</pre>
+                        ) : (
+                            <div className="no-output">Run the code to see output</div>
+                        )}
+                    </div>
                 </div>
             </div>
         </NodeViewWrapper>

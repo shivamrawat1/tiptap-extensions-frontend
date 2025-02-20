@@ -7,7 +7,7 @@
     .question-section {
         padding: 1rem;
         background-color: #ffffff;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 2px solid #1e1e1e;
 
         .question-input {
             width: 100%;
@@ -39,6 +39,20 @@
         }
     }
 
+    .code-content-wrapper {
+        display: flex;
+        flex-direction: row;
+        min-height: 300px;
+        background-color: #1e1e1e;
+    }
+
+    .code-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid #333;
+    }
+
     .code-block-header {
         display: flex;
         justify-content: space-between;
@@ -50,6 +64,27 @@
         .language-label {
             font-family: monospace;
             font-size: 0.9rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .reset-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+
+            &:hover {
+                background-color: #45a049;
+            }
         }
 
         .run-button {
@@ -74,39 +109,53 @@
     }
 
     .code-editor {
-        border-bottom: 1px solid #e2e8f0;
+        flex: 1;
+        border-bottom: none;
+
+        &>div {
+            height: 100% !important;
+        }
     }
 
     .output-section {
-        background-color: #ffffff;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #1e1e1e;
+        max-width: 50%;
 
         .output-header {
             padding: 0.5rem 1rem;
             font-weight: bold;
-            border-bottom: 1px solid #e2e8f0;
-            color: #1a1a1a;
+            border-bottom: 1px solid #333;
+            color: #ffffff;
         }
 
         .output-content {
+            flex: 1;
             padding: 1rem;
-            min-height: 100px;
-            max-height: 200px;
             overflow-y: auto;
-            background-color: #ffffff;
+            background-color: #1e1e1e;
+            max-height: 300px;
+            min-height: 300px;
+            overflow-x: auto;
+            word-wrap: break-word;
+            white-space: pre-wrap;
 
             pre {
                 margin: 0;
                 white-space: pre-wrap;
                 font-family: monospace;
-                color: #1a1a1a;
+                color: #ffffff;
+                max-width: 100%;
             }
 
             .error {
-                color: #dc3545;
+                color: #ff6b6b;
             }
 
             .no-output {
-                color: #1a1a1a;
+                color: #999;
                 font-style: italic;
             }
         }
