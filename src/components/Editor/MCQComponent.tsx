@@ -3,6 +3,7 @@ import { NodeViewWrapper, NodeViewProps } from '@tiptap/react';
 import { Editor } from '@tiptap/core';
 import '../../styles/components/_mcq.scss';
 import { MCQAttributes } from './extensions/MCQExtension';
+import { submitMCQAnswerWithDefaultUser } from '../../services/mcqSubmissionService';
 
 export const MCQComponent: React.FC<NodeViewProps> = ({
     node,
@@ -123,9 +124,28 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
         safeUpdateAttributes({ selectedAnswer: null });
     };
 
-    const handleSubmit = () => {
-        // Will be implemented later
-        console.log('Submit clicked');
+    const handleSubmit = async () => {
+        if (!attrs.selectedAnswer) {
+            console.error('Please select an answer');
+            return;
+        }
+
+        try {
+            const response = await submitMCQAnswerWithDefaultUser(
+                attrs.id,
+                attrs.selectedAnswer.toString(),
+                attrs.correctAnswer?.toString() || ''
+            );
+
+            if (response.success) {
+                console.log('Submission successful');
+                safeUpdateAttributes({ selectedAnswer: null });
+            } else {
+                console.error('Submission failed: ' + response.message);
+            }
+        } catch (error) {
+            console.error('Error submitting answer: ' + (error instanceof Error ? error.message : 'Unknown error'));
+        }
     };
 
     return (
