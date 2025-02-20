@@ -38,13 +38,13 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
         };
     }, [editor]);
 
-    // Direct attribute updates
+    // Allow all updates that have updateAttributes
     const safeUpdateAttributes = React.useCallback((attrs: Partial<MCQAttributes>) => {
-        if (updateAttributes && isEditable) {
+        if (updateAttributes) {
             updateAttributes(attrs);
-            forceUpdate(); // Force re-render to show changes immediately
+            forceUpdate();
         }
-    }, [updateAttributes, isEditable]);
+    }, [updateAttributes]);
 
     const attrs = node.attrs as MCQAttributes;
 
@@ -64,33 +64,37 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
     };
 
     const handleQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        safeUpdateAttributes({ question: e.target.value });
-    };
-
-    const handleChoiceChange = (index: number, value: string) => {
-        const newChoices = [...attrs.choices];
-        newChoices[index] = value;
-        safeUpdateAttributes({ choices: newChoices });
-    };
-
-    const handleCorrectAnswerChange = (index: number) => {
-        safeUpdateAttributes({ correctAnswer: index });
-    };
-
-    const handleStudentSelection = (index: number) => {
-        if (!isEditable) {
-            safeUpdateAttributes({ selectedAnswer: index });
+        if (isEditable) {
+            safeUpdateAttributes({ question: e.target.value });
         }
     };
 
+    const handleChoiceChange = (index: number, value: string) => {
+        if (isEditable) {
+            const newChoices = [...attrs.choices];
+            newChoices[index] = value;
+            safeUpdateAttributes({ choices: newChoices });
+        }
+    };
+
+    const handleCorrectAnswerChange = (index: number) => {
+        if (isEditable) {
+            safeUpdateAttributes({ correctAnswer: index });
+        }
+    };
+
+    const handleStudentSelection = (index: number) => {
+        safeUpdateAttributes({ selectedAnswer: index });
+    };
+
     const addOption = () => {
-        if (!isEditable) return; // Only allow adding options in edit mode
+        if (!isEditable) return;
         const newChoices = [...attrs.choices, `Option ${attrs.choices.length + 1}`];
         safeUpdateAttributes({ choices: newChoices });
     };
 
     const removeOption = (index: number) => {
-        if (!isEditable || attrs.choices.length <= 2) return; // Only allow removing in edit mode
+        if (!isEditable || attrs.choices.length <= 2) return;
 
         const newChoices = attrs.choices.filter((_, i) => i !== index);
         let newCorrectAnswer = attrs.correctAnswer;
@@ -113,6 +117,15 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
         if (isEditable && deleteNode) {
             deleteNode();
         }
+    };
+
+    const handleClearAnswer = () => {
+        safeUpdateAttributes({ selectedAnswer: null });
+    };
+
+    const handleSubmit = () => {
+        // Will be implemented later
+        console.log('Submit clicked');
     };
 
     return (
@@ -175,7 +188,10 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
                     <div className="mcq-question">{attrs.question}</div>
                     <div className="mcq-choices">
                         {attrs.choices.map((choice: string, index: number) => (
-                            <div key={index} className="mcq-choice">
+                            <div
+                                key={index}
+                                className={`mcq-choice ${attrs.selectedAnswer === index ? 'selected' : ''}`}
+                            >
                                 <input
                                     type="radio"
                                     name={`mcq-answer-${attrs.id}`}
@@ -185,6 +201,22 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
                                 <label>{choice}</label>
                             </div>
                         ))}
+                    </div>
+                    <div className="mcq-actions">
+                        <button
+                            className="mcq-action-btn clear-btn"
+                            onClick={handleClearAnswer}
+                            disabled={attrs.selectedAnswer === null}
+                        >
+                            Clear
+                        </button>
+                        <button
+                            className="mcq-action-btn submit-btn"
+                            onClick={handleSubmit}
+                            disabled={attrs.selectedAnswer === null}
+                        >
+                            Submit →
+                        </button>
                     </div>
                 </div>
             )}
