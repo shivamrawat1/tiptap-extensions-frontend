@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { EditorBubbleMenu } from "./BubbleMenu";
-import { CommandMenu } from "./CommandMenu";
+import { CommandMenu } from "./CommandMenuOptions";
 import { extensions, defaultContent } from "./config";
 import '../../styles/components/bubblebar.scss';
 import '../../styles/components/_command-menu.scss';

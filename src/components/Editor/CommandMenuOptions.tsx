@@ -32,6 +32,11 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({ editor, isOpen, setIsO
             command: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
         },
         {
+            title: 'Heading 3',
+            description: 'Convert to a small section heading block',
+            command: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
+        },
+        {
             title: 'Bullet List',
             description: 'Create a bulleted list',
             command: () => editor.chain().focus().toggleBulletList().run(),
