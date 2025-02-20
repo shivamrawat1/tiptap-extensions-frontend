@@ -13,19 +13,24 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
 }) => {
     const [, forceUpdate] = React.useReducer(x => x + 1, 0);
 
-    // Get editable state directly from editor
-    const isEditable = editor?.isEditable ?? false;
+    // Track editor's editable state
+    const [isEditable, setIsEditable] = React.useState(editor?.isEditable ?? false);
 
-    // Force update when editor state changes
+    // Listen to editor state changes for instant view/edit switching
     React.useEffect(() => {
         if (!editor) return;
 
         const handleStateChange = () => {
+            setIsEditable(editor.isEditable);
             forceUpdate();
         };
 
+        // Listen to both transaction and update events
         editor.on('transaction', handleStateChange);
         editor.on('update', handleStateChange);
+
+        // Initial state sync
+        handleStateChange();
 
         return () => {
             editor.off('transaction', handleStateChange);
@@ -33,13 +38,30 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
         };
     }, [editor]);
 
+    // Direct attribute updates
     const safeUpdateAttributes = React.useCallback((attrs: Partial<MCQAttributes>) => {
-        if (isEditable && updateAttributes) {
+        if (updateAttributes && isEditable) {
             updateAttributes(attrs);
+            forceUpdate(); // Force re-render to show changes immediately
         }
-    }, [isEditable, updateAttributes]);
+    }, [updateAttributes, isEditable]);
 
     const attrs = node.attrs as MCQAttributes;
+
+    // Clear input handlers
+    const handleQuestionFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+        if (e.target.value === 'Enter your question here') {
+            safeUpdateAttributes({ question: '' });
+        }
+    };
+
+    const handleOptionFocus = (index: number, value: string) => {
+        if (value.startsWith('Option ')) {
+            const newChoices = [...attrs.choices];
+            newChoices[index] = '';
+            safeUpdateAttributes({ choices: newChoices });
+        }
+    };
 
     const handleQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         safeUpdateAttributes({ question: e.target.value });
@@ -62,13 +84,13 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
     };
 
     const addOption = () => {
-        if (!isEditable) return;
+        if (!isEditable) return; // Only allow adding options in edit mode
         const newChoices = [...attrs.choices, `Option ${attrs.choices.length + 1}`];
         safeUpdateAttributes({ choices: newChoices });
     };
 
     const removeOption = (index: number) => {
-        if (!isEditable || attrs.choices.length <= 2) return;
+        if (!isEditable || attrs.choices.length <= 2) return; // Only allow removing in edit mode
 
         const newChoices = attrs.choices.filter((_, i) => i !== index);
         let newCorrectAnswer = attrs.correctAnswer;
@@ -102,6 +124,7 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
                             type="text"
                             value={attrs.question}
                             onChange={handleQuestionChange}
+                            onFocus={handleQuestionFocus}
                             placeholder="Enter your question"
                             className="mcq-question-input"
                         />
@@ -120,6 +143,7 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
                                     type="text"
                                     value={choice}
                                     onChange={(e) => handleChoiceChange(index, e.target.value)}
+                                    onFocus={() => handleOptionFocus(index, choice)}
                                     placeholder={`Option ${index + 1}`}
                                 />
                                 <input
@@ -151,15 +175,7 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
                     <div className="mcq-question">{attrs.question}</div>
                     <div className="mcq-choices">
                         {attrs.choices.map((choice: string, index: number) => (
-                            <div
-                                key={index}
-                                className={`mcq-choice ${attrs.selectedAnswer === index ? 'selected' : ''}
-                                    ${attrs.selectedAnswer !== null &&
-                                        attrs.correctAnswer === index ? 'correct' : ''}
-                                    ${attrs.selectedAnswer === index &&
-                                        attrs.selectedAnswer !== attrs.correctAnswer ? 'incorrect' : ''
-                                    }`}
-                            >
+                            <div key={index} className="mcq-choice">
                                 <input
                                     type="radio"
                                     name={`mcq-answer-${attrs.id}`}

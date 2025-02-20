@@ -33,15 +33,24 @@ export const MCQExtension = Node.create<MCQOptions>({
 
     content: 'inline*',
 
-    atom: true,
-
     addAttributes() {
         return {
             question: {
                 default: 'Enter your question here',
+                parseHTML: element => element.getAttribute('question') || 'Enter your question here',
+                renderHTML: attributes => ({
+                    question: attributes.question,
+                }),
             },
             choices: {
                 default: ['Option 1', 'Option 2'],
+                parseHTML: element => {
+                    const choices = element.getAttribute('choices');
+                    return choices ? JSON.parse(choices) : ['Option 1', 'Option 2'];
+                },
+                renderHTML: attributes => ({
+                    choices: JSON.stringify(attributes.choices),
+                }),
             },
             correctAnswer: {
                 default: null,
@@ -92,10 +101,6 @@ export const MCQExtension = Node.create<MCQOptions>({
     },
 
     addNodeView() {
-        return ReactNodeViewRenderer(MCQComponent, {
-            update: ({ newNode, oldNode }) => {
-                return !oldNode.sameMarkup(newNode);
-            },
-        });
+        return ReactNodeViewRenderer(MCQComponent);
     },
 }); 
