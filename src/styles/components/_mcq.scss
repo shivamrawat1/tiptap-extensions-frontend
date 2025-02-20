@@ -204,6 +204,24 @@
 
                 &.submit-btn {
                     min-width: 100px;
+                    background-color: #007bff;
+                    color: white;
+                    border-color: #007bff;
+
+                    &.submitted {
+                        background-color: #28a745;
+                        border-color: #28a745;
+                    }
+
+                    &:hover:not(:disabled) {
+                        background-color: #0056b3;
+                        border-color: #0056b3;
+
+                        &.submitted {
+                            background-color: #218838;
+                            border-color: #218838;
+                        }
+                    }
                 }
             }
         }

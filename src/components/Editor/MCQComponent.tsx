@@ -17,6 +17,9 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
     // Track editor's editable state
     const [isEditable, setIsEditable] = React.useState(editor?.isEditable ?? false);
 
+    // Add new state to track submission status
+    const [isSubmitted, setIsSubmitted] = React.useState(false);
+
     // Listen to editor state changes for instant view/edit switching
     React.useEffect(() => {
         if (!editor) return;
@@ -122,6 +125,7 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
 
     const handleClearAnswer = () => {
         safeUpdateAttributes({ selectedAnswer: null });
+        setIsSubmitted(false); // Reset submission state when clearing
     };
 
     const handleSubmit = async () => {
@@ -142,7 +146,7 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
 
             if (response.success) {
                 console.log('Submission successful');
-                safeUpdateAttributes({ selectedAnswer: null });
+                setIsSubmitted(true); // Set submitted state to true on success
             } else {
                 console.error('Submission failed: ' + response.message);
             }
@@ -231,11 +235,11 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
                             Clear
                         </button>
                         <button
-                            className="mcq-action-btn submit-btn"
+                            className={`mcq-action-btn submit-btn ${isSubmitted ? 'submitted' : ''}`}
                             onClick={handleSubmit}
-                            disabled={attrs.selectedAnswer === null}
+                            disabled={attrs.selectedAnswer === null || isSubmitted}
                         >
-                            Submit →
+                            {isSubmitted ? 'Submitted' : 'Submit →'}
                         </button>
                     </div>
                 </div>
