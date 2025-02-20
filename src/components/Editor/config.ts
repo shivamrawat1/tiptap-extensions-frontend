@@ -3,6 +3,7 @@ import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
 import StarterKit from "@tiptap/starter-kit";
 import { CommandsExtension } from './extensions/CommandsExtension'
+import { MCQExtension } from './extensions/MCQExtension';
 
 
 
@@ -20,6 +21,7 @@ export const extensions = [
     },
   }),
   CommandsExtension,
+  MCQExtension,
 ];
 
 export const defaultContent = `

@@ -4,16 +4,10 @@ import { Range } from '@tiptap/core';
 import Suggestion from '@tiptap/suggestion';
 import { ReactRenderer } from '@tiptap/react';
 import tippy, { Instance, GetReferenceClientRect } from 'tippy.js';
-import { CommandsView, CommandProps } from '../CommandsView';
+import { CommandsView } from '../CommandsView';
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
 
-// Define the props interface here since it's specific to this usage
-interface CommandsViewProps {
-    items: CommandItem[];
-    command: ({ command }: { command: CommandItem }) => void;
-}
-
-// Rename the local interface to avoid conflict with imported CommandProps
+// Define the interface here since we need it in this file
 interface CommandItem {
     title: string;
     description: string;
@@ -106,6 +100,19 @@ export const CommandsExtension = Extension.create({
                                     .run();
                             },
                         },
+                        {
+                            title: 'Quiz',
+                            description: 'Add a multiple choice question',
+                            attrs: { 'data-test-id': 'insert-mcq' },
+                            command: ({ editor, range }) => {
+                                editor
+                                    .chain()
+                                    .focus()
+                                    .deleteRange(range)
+                                    .setMCQ()
+                                    .run();
+                            },
+                        },
                     ];
 
                     return items
@@ -115,18 +122,26 @@ export const CommandsExtension = Extension.create({
                 render: () => {
                     let component: ReactRenderer;
                     let popup: Instance;
-
                     const defaultRect: DOMRect = new DOMRect(0, 0, 0, 0);
 
                     return {
                         onStart: (props) => {
+                            // Create a wrapper for the command handling
+                            const commandHandler = (commandProps: { command: CommandItem }) => {
+                                const { command } = commandProps;
+                                command.command({ editor: props.editor, range: props.range });
+                            };
+
+                            // Create new props with the wrapped command handler
+                            const enhancedProps = {
+                                items: props.items,
+                                command: commandHandler,
+                                editor: props.editor,
+                                range: props.range,
+                            };
+
                             component = new ReactRenderer(CommandsView, {
-                                props: {
-                                    items: props.items,
-                                    command: ({ command }: { command: CommandItem }) => {
-                                        command.command({ editor: props.editor, range: props.range });
-                                    },
-                                },
+                                props: enhancedProps,
                                 editor: props.editor,
                             });
 
@@ -144,7 +159,20 @@ export const CommandsExtension = Extension.create({
                             });
                         },
                         onUpdate: (props) => {
-                            component.updateProps(props);
+                            // Create the same wrapper for updates
+                            const commandHandler = (commandProps: { command: CommandItem }) => {
+                                const { command } = commandProps;
+                                command.command({ editor: props.editor, range: props.range });
+                            };
+
+                            const enhancedProps = {
+                                items: props.items,
+                                command: commandHandler,
+                                editor: props.editor,
+                                range: props.range,
+                            };
+
+                            component.updateProps(enhancedProps);
 
                             const getReferenceClientRect: GetReferenceClientRect = () => {
                                 return props.clientRect?.() || defaultRect;

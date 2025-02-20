@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import '../../styles/components/_commands.scss';
 
-export interface CommandProps {
+export interface CommandItem {
     title: string;
     description: string;
     attrs: Record<string, string>;
@@ -9,8 +9,10 @@ export interface CommandProps {
 }
 
 interface CommandsViewProps {
-    items: CommandProps[];
-    command: ({ command }: { command: CommandProps }) => void;
+    items: CommandItem[];
+    command: (props: { command: CommandItem }) => void;
+    editor: any;
+    range: any;
 }
 
 // Add this interface to define the ref methods
