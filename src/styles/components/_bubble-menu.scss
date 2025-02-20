@@ -5,11 +5,10 @@
     padding: 0.5rem;
     border-radius: 0.5rem;
 
-    // the bubble menu buttons
     button {
         border: none;
         background: none;
-        color: #bb0707;
+        color: #fff;
         padding: 0.25rem 0.5rem;
         font-size: 0.875rem;
         cursor: pointer;
@@ -23,9 +22,4 @@
             background-color: #1F1F1F;
         }
     }
-}
-
-.editor-wrapper {
-    position: relative;
-    background: black;
 }

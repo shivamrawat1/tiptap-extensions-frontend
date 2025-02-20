@@ -11,7 +11,8 @@
     "@tiptap/suggestion": "^2.11.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "sass": "^1.85.0"
+    "sass": "^1.85.0",
+    "sass-loader": "^16.0.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

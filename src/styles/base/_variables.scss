@@ -1,0 +1,18 @@
+:root {
+    // Colors
+    --color-background: #1d1d1d;
+    --color-text: #e6e6e6;
+    --color-white-alpha-20: rgba(255, 255, 255, 0.2);
+    --color-white-alpha-30: rgba(255, 255, 255, 0.3);
+    --color-white-alpha-10: rgba(255, 255, 255, 0.1);
+    --color-white-alpha-80: rgba(255, 255, 255, 0.8);
+
+    // Spacing
+    --spacing-base: 1rem;
+    --spacing-small: 0.75rem;
+    --spacing-large: 2rem;
+
+    // Border radius
+    --border-radius: 0.4em;
+    --border-radius-large: 0.5rem;
+}

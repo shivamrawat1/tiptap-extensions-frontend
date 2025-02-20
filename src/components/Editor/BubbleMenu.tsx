@@ -1,6 +1,7 @@
 import React from 'react';
 import { BubbleMenu } from '@tiptap/react';
 import { Editor } from '@tiptap/core';
+import '../../styles/components/_bubble-menu.scss';
 
 interface BubbleMenuProps {
     editor: Editor;

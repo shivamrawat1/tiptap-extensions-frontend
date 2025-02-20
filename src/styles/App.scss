@@ -1,0 +1,10 @@
+/* Base styles */
+@use 'base/variables';
+@use 'base/reset';
+@use 'base/typography';
+
+/* Component styles */
+@use 'components/editor';
+@use 'components/bubble-menu';
+@use 'components/commands';
+@use 'components/buttons';

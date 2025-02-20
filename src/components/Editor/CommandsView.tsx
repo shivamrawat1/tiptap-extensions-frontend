@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import './CommandsView.scss';
+import '../../styles/components/_commands.scss';
 
 export interface CommandProps {
     title: string;

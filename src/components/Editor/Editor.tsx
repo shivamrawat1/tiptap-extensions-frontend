@@ -3,7 +3,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { EditorBubbleMenu } from "./BubbleMenu";
 import { EditableToggle } from "./EditableToggle";
 import { extensions, defaultContent } from "./config";
-import '../../styles/components/bubblebar.scss';
+import '../../styles/components/_editor.scss';
 
 export const Editor: React.FC = () => {
     // Add state for tracking editable status
@@ -29,10 +29,13 @@ export const Editor: React.FC = () => {
 
     return (
         <div>
-            <EditableToggle
-                isEditable={isEditable}
-                onToggle={toggleEditable}
-            />
+            <div className="toggle-container">
+                <span className="header-text">TIPTAP</span>
+                <EditableToggle
+                    isEditable={isEditable}
+                    onToggle={toggleEditable}
+                />
+            </div>
             <div className="editor-wrapper">
                 {editor && <EditorBubbleMenu editor={editor} />}
                 <EditorContent editor={editor} />

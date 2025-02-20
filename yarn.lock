@@ -8646,6 +8646,13 @@ sass-loader@^12.3.0:
     klona "^2.0.4"
     neo-async "^2.6.2"
 
+sass-loader@^16.0.5:
+  version "16.0.5"
+  resolved "https://registry.npmjs.org/sass-loader/-/sass-loader-16.0.5.tgz"
+  integrity sha512-oL+CMBXrj6BZ/zOq4os+UECPL+bWqt6OAC6DWS8Ln8GZRcMDjlJ4JC3FBDuHJdYaFWIdKNIBYmtZtK2MaMkNIw==
+  dependencies:
+    neo-async "^2.6.2"
+
 sass@^1.3.0, sass@^1.85.0:
   version "1.85.0"
   resolved "https://registry.npmjs.org/sass/-/sass-1.85.0.tgz"

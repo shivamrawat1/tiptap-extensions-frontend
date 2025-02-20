@@ -1,4 +1,6 @@
 import React from 'react';
+import '../../styles/components/_toggle-button.scss';
+
 
 interface EditableToggleProps {
     isEditable: boolean;
@@ -9,7 +11,7 @@ export const EditableToggle: React.FC<EditableToggleProps> = ({ isEditable, onTo
     return (
         <button
             onClick={onToggle}
-            className="mb-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="toggle-button"
         >
             {isEditable ? 'Switch to View Mode' : 'Switch to Edit Mode'}
         </button>

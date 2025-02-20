@@ -1,0 +1,26 @@
+.toggle-container {
+    width: 100%;
+    padding-right: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.toggle-button {
+    background-color: #000;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.header-text {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    position: fixed;
+    top: 1rem;
+    left: 2rem;
+}

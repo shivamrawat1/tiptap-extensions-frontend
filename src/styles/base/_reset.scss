@@ -1,0 +1,15 @@
+/* Basic document styles */
+:root {
+    color-scheme: dark;
+}
+
+body {
+    box-sizing: border-box;
+    margin: 0;
+    background: var(--color-background);
+    font-family: sans-serif;
+    line-height: 1.4;
+    color: var(--color-text);
+    padding: var(--spacing-base);
+    min-height: 100vh;
+}
