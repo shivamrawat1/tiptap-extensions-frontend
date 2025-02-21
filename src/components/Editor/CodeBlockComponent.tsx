@@ -30,7 +30,8 @@ interface CodeBlockAttributes {
 export const CodeBlockComponent: React.FC<NodeViewProps> = ({
     node,
     updateAttributes,
-    editor
+    editor,
+    deleteNode
 }) => {
     const [output, setOutput] = useState<string>('');
     const [isRunning, setIsRunning] = useState(false);
@@ -255,17 +256,32 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
         }
     };
 
+    const handleDelete = () => {
+        if (deleteNode) {
+            deleteNode();
+        }
+    };
+
     return (
         <NodeViewWrapper className="code-block-wrapper">
             <div className="question-section">
                 {isEditable ? (
                     <>
-                        <textarea
-                            className="question-input"
-                            value={attrs.question || ''}
-                            onChange={handleQuestionChange}
-                            placeholder="Enter your question here..."
-                        />
+                        <div className="question-header">
+                            <button
+                                className="delete-button"
+                                onClick={handleDelete}
+                                title="Delete code block"
+                            >
+                                Delete
+                            </button>
+                            <textarea
+                                className="question-input"
+                                value={attrs.question || ''}
+                                onChange={handleQuestionChange}
+                                placeholder="Write your question here"
+                            />
+                        </div>
                         <div className="test-cases-section">
                             <h4>Test Cases</h4>
                             {(attrs.testCases || []).map((testCase, index) => (

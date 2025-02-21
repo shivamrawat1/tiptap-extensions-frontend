@@ -75,3 +75,11 @@
         margin: 2rem 0;
     }
 }
+
+.monaco-editor {
+
+    .margin-view-overlays .line-numbers,
+    .current-line {
+        border: none !important;
+    }
+}
