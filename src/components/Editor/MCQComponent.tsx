@@ -20,6 +20,9 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
     // Add new state to track submission status
     const [isSubmitted, setIsSubmitted] = React.useState(false);
 
+    // Add loading state
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
+
     // Listen to editor state changes for instant view/edit switching
     React.useEffect(() => {
         if (!editor) return;
@@ -129,14 +132,19 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
     };
 
     const handleSubmit = async () => {
-        if (attrs.selectedAnswer === null) {
-            console.error('Please select an answer');
+        if (attrs.selectedAnswer === null || isSubmitting) {
             return;
         }
 
+        setIsSubmitting(true);
         try {
             const selectedAnswerText = attrs.choices[attrs.selectedAnswer];
             const correctAnswerText = attrs.correctAnswer !== null ? attrs.choices[attrs.correctAnswer] : '';
+
+            if (!attrs.id) {
+                console.error('MCQ ID is missing');
+                return;
+            }
 
             const response = await submitMCQAnswerWithDefaultUser(
                 attrs.id,
@@ -146,12 +154,22 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
 
             if (response.success) {
                 console.log('Submission successful');
-                setIsSubmitted(true); // Set submitted state to true on success
+                // Update the attributes with the submission result
+                safeUpdateAttributes({
+                    selectedAnswer: attrs.selectedAnswer,
+                    isAnswered: true,
+                    isCorrect: attrs.selectedAnswer === attrs.correctAnswer
+                });
+                setIsSubmitted(true);
             } else {
-                console.error('Submission failed: ' + response.message);
+                console.error('Submission failed:', response.message);
+                setIsSubmitted(false);
             }
         } catch (error) {
-            console.error('Error submitting answer: ' + (error instanceof Error ? error.message : 'Unknown error'));
+            console.error('Error submitting answer:', error);
+            setIsSubmitted(false);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -237,9 +255,9 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
                         <button
                             className={`mcq-action-btn submit-btn ${isSubmitted ? 'submitted' : ''}`}
                             onClick={handleSubmit}
-                            disabled={attrs.selectedAnswer === null || isSubmitted}
+                            disabled={attrs.selectedAnswer === null || isSubmitted || isSubmitting}
                         >
-                            {isSubmitted ? 'Submitted' : 'Submit →'}
+                            {isSubmitting ? 'Submitting...' : isSubmitted ? 'Submitted' : 'Submit →'}
                         </button>
                     </div>
                 </div>

@@ -1,8 +1,10 @@
-import React, { useState, useReducer, useEffect } from 'react';
+import React, { useState, useReducer, useEffect, useRef } from 'react';
 import { NodeViewWrapper, NodeViewProps } from '@tiptap/react';
 import MonacoEditor from '@monaco-editor/react';
 import { executePythonCode } from '../../services/pythonExecutionService';
+import { generateHint } from '../../services/hintGenerationService';
 import '../../styles/components/_codeblock.scss';
+import { createSafeResizeObserver } from '../../utils/resizeObserverUtils';
 
 interface TestCase {
     input: string;
@@ -20,6 +22,7 @@ interface CodeBlockAttributes {
     code: string;
     template?: string;
     question: string;
+    hint: string;
     testCases: TestCase[];
     testResults: TestResult[] | null;
 }
@@ -35,9 +38,36 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
     const [, forceUpdate] = useReducer(x => x + 1, 0);
     const [savedCode, setSavedCode] = useState<string | null>(null);
     const [testResults, setTestResults] = useState<TestResult[] | null>(null);
+    const [showHint, setShowHint] = useState(false);
+    const [isGeneratingHint, setIsGeneratingHint] = useState(false);
 
     // Track editor's editable state
     const [isEditable, setIsEditable] = useState(editor?.isEditable ?? false);
+
+    // Declare attrs before using it in useEffect
+    const attrs = node.attrs as CodeBlockAttributes;
+
+    const editorRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const element = editorRef.current;
+        if (!element) return;
+
+        const observer = createSafeResizeObserver((entries) => {
+            // Handle resize with less frequency
+            requestAnimationFrame(() => {
+                // Your resize handling logic here
+            });
+        });
+
+        if (observer) {
+            observer.observe(element);
+        }
+
+        return () => {
+            observer?.disconnect();
+        };
+    }, []);
 
     // Listen to editor state changes for instant view/edit switching
     useEffect(() => {
@@ -48,7 +78,7 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
 
             // If switching from edit to view mode, save the current code
             if (isEditable && !newIsEditable) {
-                setSavedCode(node.attrs.code);
+                setSavedCode(attrs.code);
             }
 
             setIsEditable(newIsEditable);
@@ -66,9 +96,25 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
             editor.off('transaction', handleStateChange);
             editor.off('update', handleStateChange);
         };
-    }, [editor, isEditable, node.attrs.code]);
+    }, [editor, isEditable, attrs.code]);
 
-    const attrs = node.attrs as CodeBlockAttributes;
+    // Debug useEffect
+    useEffect(() => {
+        console.log('isEditable:', isEditable);
+        console.log('Hint:', attrs.hint);
+    }, [isEditable, attrs.hint]);
+
+    // Add more detailed debugging
+    useEffect(() => {
+        console.log('Debug values:', {
+            isEditable,
+            hint: attrs.hint,
+            hintExists: Boolean(attrs.hint),
+            hintTrimmed: attrs.hint?.trim(),
+            showHint,
+            conditionResult: !isEditable && attrs.hint && attrs.hint.trim() !== ''
+        });
+    }, [isEditable, attrs.hint, showHint]);
 
     const handleEditorChange = (value: string | undefined) => {
         if (value !== undefined) {
@@ -181,6 +227,28 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
         });
     };
 
+    const handleGenerateHint = async () => {
+        setIsGeneratingHint(true);
+        try {
+            const response = await generateHint(
+                attrs.template || '',
+                attrs.code,
+                attrs.question
+            );
+
+            if (response.success && response.hint) {
+                updateAttributes({ hint: response.hint });
+                setShowHint(true);
+            } else {
+                setError(response.error || 'Failed to generate hint');
+            }
+        } catch (err) {
+            setError('Failed to generate hint');
+        } finally {
+            setIsGeneratingHint(false);
+        }
+    };
+
     return (
         <NodeViewWrapper className="code-block-wrapper">
             <div className="question-section">
@@ -219,6 +287,17 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
                     <div className="code-block-header">
                         <span className="language-label">Python</span>
                         <div className="button-group">
+                            {/* Debug: isEditable={isEditable.toString()}, hasHint={Boolean(attrs.hint).toString()} */}
+                            {(!isEditable) && (
+                                <button
+                                    className="hint-button"
+                                    onClick={handleGenerateHint}
+                                    disabled={isGeneratingHint}
+                                    title="Generate Hint"
+                                >
+                                    {isGeneratingHint ? 'Generating...' : (showHint ? 'Hide Hint' : 'Show Hint')}
+                                </button>
+                            )}
                             <button
                                 className="reset-button"
                                 onClick={handleReset}
@@ -242,6 +321,14 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
                             </button>
                         </div>
                     </div>
+
+                    {(!isEditable) && showHint && (
+                        <div className="hint-container">
+                            <div className="hint-content">
+                                {attrs.hint || 'No hint available'}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="code-editor">
                         <MonacoEditor

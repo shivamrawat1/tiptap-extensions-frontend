@@ -17,6 +17,7 @@ declare module '@tiptap/core' {
             setPythonCodeBlock: (options?: {
                 template?: string;
                 question?: string;
+                hint?: string;
                 testCases?: TestCase[];
             }) => ReturnType;
         };
@@ -42,6 +43,9 @@ export const CodeBlockExtension = Node.create<CodeBlockOptions>({
                 default: null,
             },
             question: {
+                default: '',
+            },
+            hint: {
                 default: '',
             },
             lastExecution: {
@@ -77,6 +81,7 @@ export const CodeBlockExtension = Node.create<CodeBlockOptions>({
             setPythonCodeBlock:
                 (options = {}) =>
                     ({ commands }) => {
+                        console.log('Creating code block with options:', options);
                         return commands.insertContent({
                             type: this.name,
                             attrs: {
@@ -84,6 +89,7 @@ export const CodeBlockExtension = Node.create<CodeBlockOptions>({
                                 code: options.template || '# Write your Python code here\n',
                                 template: options.template || null,
                                 question: options.question || '',
+                                hint: options.hint || '',
                                 testCases: options.testCases || [],
                             },
                         });

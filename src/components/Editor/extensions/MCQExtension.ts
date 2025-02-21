@@ -10,11 +10,13 @@ export interface MCQOptions {
 }
 
 export interface MCQAttributes {
+    id: string;
     question: string;
     choices: string[];
     correctAnswer: number | null;
     selectedAnswer: number | null;
-    id: string;
+    isAnswered?: boolean;
+    isCorrect?: boolean;
 }
 
 declare module '@tiptap/core' {
@@ -53,10 +55,16 @@ export const MCQExtension = Node.create<MCQOptions>({
                 }),
             },
             correctAnswer: {
-                default: 0,
+                default: null,
             },
             selectedAnswer: {
                 default: null,
+            },
+            isAnswered: {
+                default: false,
+            },
+            isCorrect: {
+                default: false,
             },
             id: {
                 default: () => `mcq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -86,8 +94,10 @@ export const MCQExtension = Node.create<MCQOptions>({
                             attrs: {
                                 question: 'Enter your question here',
                                 choices: ['Option 1', 'Option 2'],
-                                correctAnswer: 0,
+                                correctAnswer: null,
                                 selectedAnswer: null,
+                                isAnswered: false,
+                                isCorrect: false,
                                 id: `mcq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                             },
                         });
