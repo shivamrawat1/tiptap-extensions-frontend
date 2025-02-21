@@ -13,15 +13,20 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
     getPos,
 }) => {
     const [, forceUpdate] = React.useReducer(x => x + 1, 0);
-
-    // Track editor's editable state
     const [isEditable, setIsEditable] = React.useState(editor?.isEditable ?? false);
-
-    // Add new state to track submission status
     const [isSubmitted, setIsSubmitted] = React.useState(false);
-
-    // Add loading state
     const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+    // Move attrs declaration up
+    const attrs = node.attrs as MCQAttributes;
+
+    // Move safeUpdateAttributes up before it's used
+    const safeUpdateAttributes = React.useCallback((attrs: Partial<MCQAttributes>) => {
+        if (updateAttributes) {
+            updateAttributes(attrs);
+            forceUpdate();
+        }
+    }, [updateAttributes]);
 
     // Listen to editor state changes for instant view/edit switching
     React.useEffect(() => {
@@ -32,11 +37,9 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
             forceUpdate();
         };
 
-        // Listen to both transaction and update events
         editor.on('transaction', handleStateChange);
         editor.on('update', handleStateChange);
 
-        // Initial state sync
         handleStateChange();
 
         return () => {
@@ -45,15 +48,12 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
         };
     }, [editor]);
 
-    // Allow all updates that have updateAttributes
-    const safeUpdateAttributes = React.useCallback((attrs: Partial<MCQAttributes>) => {
-        if (updateAttributes) {
-            updateAttributes(attrs);
-            forceUpdate();
+    // Now this effect can safely use attrs and safeUpdateAttributes
+    React.useEffect(() => {
+        if (!isEditable && attrs.correctAnswer === null) {
+            safeUpdateAttributes({ correctAnswer: 0 });
         }
-    }, [updateAttributes]);
-
-    const attrs = node.attrs as MCQAttributes;
+    }, [isEditable, attrs.correctAnswer, safeUpdateAttributes]);
 
     // Clear input handlers
     const handleQuestionFocus = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -84,8 +84,10 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
         }
     };
 
+    // Modify the handleCorrectAnswerChange function to prevent deselection
     const handleCorrectAnswerChange = (index: number) => {
         if (isEditable) {
+            // Always update to the new selection, never allow null
             safeUpdateAttributes({ correctAnswer: index });
         }
     };
@@ -191,17 +193,18 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
                             onClick={handleDelete}
                             title="Delete MCQ"
                         >
-                            ×
+                            Delete
                         </button>
                     </div>
                     <div className="mcq-choices">
                         {attrs.choices.map((choice: string, index: number) => (
-                            <div key={index} className="mcq-choice-edit">
+                            <div key={index} className={`mcq-choice-edit ${attrs.correctAnswer === index ? 'is-correct' : ''}`}>
                                 <input
                                     type="radio"
                                     name={`correctAnswer-${attrs.id}`}
                                     checked={attrs.correctAnswer === index}
                                     onChange={() => handleCorrectAnswerChange(index)}
+                                    required
                                 />
                                 <input
                                     type="text"
@@ -210,7 +213,7 @@ export const MCQComponent: React.FC<NodeViewProps> = ({
                                     onFocus={() => handleOptionFocus(index, choice)}
                                     placeholder={`Option ${index + 1}`}
                                 />
-                                <label>Correct</label>
+                                {attrs.correctAnswer === index && <label>Correct</label>}
                                 <button
                                     className="mcq-remove-option-btn"
                                     onClick={() => removeOption(index)}
