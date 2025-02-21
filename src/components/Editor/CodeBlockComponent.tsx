@@ -40,6 +40,7 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
     const [testResults, setTestResults] = useState<TestResult[] | null>(null);
     const [showHint, setShowHint] = useState(false);
     const [isGeneratingHint, setIsGeneratingHint] = useState(false);
+    const [isLoadingHint, setIsLoadingHint] = useState(false);
 
     // Track editor's editable state
     const [isEditable, setIsEditable] = useState(editor?.isEditable ?? false);
@@ -47,16 +48,26 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
     // Declare attrs before using it in useEffect
     const attrs = node.attrs as CodeBlockAttributes;
 
-    const editorRef = useRef<HTMLDivElement>(null);
+    const codeEditorRef = useRef<HTMLDivElement>(null);
+    const [editorHeight, setEditorHeight] = useState('400px');
 
+    // Update the resize observer to only watch the code editor
     useEffect(() => {
-        const element = editorRef.current;
+        const element = codeEditorRef.current;
         if (!element) return;
 
+        let rafId: number;
         const observer = createSafeResizeObserver((entries) => {
-            // Handle resize with less frequency
-            requestAnimationFrame(() => {
-                // Your resize handling logic here
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+            }
+
+            rafId = requestAnimationFrame(() => {
+                const entry = entries[0];
+                if (entry) {
+                    const height = entry.contentRect.height;
+                    setEditorHeight(`${height}px`);
+                }
             });
         });
 
@@ -65,6 +76,9 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
         }
 
         return () => {
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+            }
             observer?.disconnect();
         };
     }, []);
@@ -97,24 +111,6 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
             editor.off('update', handleStateChange);
         };
     }, [editor, isEditable, attrs.code]);
-
-    // Debug useEffect
-    useEffect(() => {
-        console.log('isEditable:', isEditable);
-        console.log('Hint:', attrs.hint);
-    }, [isEditable, attrs.hint]);
-
-    // Add more detailed debugging
-    useEffect(() => {
-        console.log('Debug values:', {
-            isEditable,
-            hint: attrs.hint,
-            hintExists: Boolean(attrs.hint),
-            hintTrimmed: attrs.hint?.trim(),
-            showHint,
-            conditionResult: !isEditable && attrs.hint && attrs.hint.trim() !== ''
-        });
-    }, [isEditable, attrs.hint, showHint]);
 
     const handleEditorChange = (value: string | undefined) => {
         if (value !== undefined) {
@@ -228,6 +224,8 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
     };
 
     const handleGenerateHint = async () => {
+        // Always generate a new hint when clicked
+        setIsLoadingHint(true);
         setIsGeneratingHint(true);
         try {
             const response = await generateHint(
@@ -237,14 +235,22 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
             );
 
             if (response.success && response.hint) {
+                // First update the hint in attributes
                 updateAttributes({ hint: response.hint });
-                setShowHint(true);
+                // Then show the hint after a brief delay to ensure the attribute is updated
+                setTimeout(() => {
+                    setShowHint(true);
+                    setIsLoadingHint(false);
+                    setIsGeneratingHint(false);
+                }, 100);
             } else {
                 setError(response.error || 'Failed to generate hint');
+                setIsLoadingHint(false);
+                setIsGeneratingHint(false);
             }
         } catch (err) {
             setError('Failed to generate hint');
-        } finally {
+            setIsLoadingHint(false);
             setIsGeneratingHint(false);
         }
     };
@@ -287,7 +293,6 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
                     <div className="code-block-header">
                         <span className="language-label">Python</span>
                         <div className="button-group">
-                            {/* Debug: isEditable={isEditable.toString()}, hasHint={Boolean(attrs.hint).toString()} */}
                             {(!isEditable) && (
                                 <button
                                     className="hint-button"
@@ -295,7 +300,7 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
                                     disabled={isGeneratingHint}
                                     title="Generate Hint"
                                 >
-                                    {isGeneratingHint ? 'Generating...' : (showHint ? 'Hide Hint' : 'Show Hint')}
+                                    {isLoadingHint ? 'Loading...' : 'Hint'}
                                 </button>
                             )}
                             <button
@@ -322,17 +327,17 @@ export const CodeBlockComponent: React.FC<NodeViewProps> = ({
                         </div>
                     </div>
 
-                    {(!isEditable) && showHint && (
+                    {(!isEditable) && attrs.hint && showHint && (
                         <div className="hint-container">
                             <div className="hint-content">
-                                {attrs.hint || 'No hint available'}
+                                {attrs.hint}
                             </div>
                         </div>
                     )}
 
-                    <div className="code-editor">
+                    <div className="code-editor" ref={codeEditorRef}>
                         <MonacoEditor
-                            height="100%"
+                            height={editorHeight}
                             language="python"
                             theme="vs-dark"
                             value={attrs.code}

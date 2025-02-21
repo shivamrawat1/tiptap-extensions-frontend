@@ -47,6 +47,13 @@ export const CodeBlockExtension = Node.create<CodeBlockOptions>({
             },
             hint: {
                 default: '',
+                parseHTML: element => element.getAttribute('data-hint') || '',
+                renderHTML: attributes => {
+                    if (attributes.hint) {
+                        return { 'data-hint': attributes.hint };
+                    }
+                    return {};
+                },
             },
             lastExecution: {
                 default: null,
