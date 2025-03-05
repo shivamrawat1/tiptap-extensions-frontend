@@ -1,5 +1,5 @@
 ## Demo
-[Link](https://www.loom.com/share/17f1ca0c70d44952a69823292ff23017?sid=5a48a226-86e7-47a5-aaab-3de9a6671f1e)
+[DEMO](https://www.loom.com/share/17f1ca0c70d44952a69823292ff23017?sid=5a48a226-86e7-47a5-aaab-3de9a6671f1e)
 
 Link to Backend Repo: https://github.com/shivamrawat1/tiptap-extensions-backend
 
