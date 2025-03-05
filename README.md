@@ -20,7 +20,7 @@ Implemented custom extensions for the TipTap editor.
 1. Navigate to the frontend directory
 
 ```bash
-cd tiptap
+cd tiptap-extensions-frontend
 ```
 
 2. Install dependencies
